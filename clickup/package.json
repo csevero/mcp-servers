@@ -1,0 +1,46 @@
+{
+  "name": "@csevero/clickup-mcp",
+  "version": "1.0.0",
+  "description": "ClickUp MCP Server - Access ClickUp tasks via Model Context Protocol",
+  "main": "build/index.js",
+  "type": "module",
+  "bin": {
+    "mcp-clickup": "./build/index.js"
+  },
+  "files": [
+    "build/"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x build/index.js",
+    "prepublishOnly": "npm run build",
+    "start": "node build/index.js",
+    "dev": "npm run build && npm run start"
+  },
+  "keywords": [
+    "mcp",
+    "clickup",
+    "model-context-protocol",
+    "ai"
+  ],
+  "author": "Carlos Severo",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/csevero/mcp-servers.git",
+    "directory": "clickup"
+  },
+  "homepage": "https://github.com/csevero/mcp-servers/tree/main/clickup",
+  "bugs": {
+    "url": "https://github.com/csevero/mcp-servers/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.5",
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "typescript": "^5.9.2"
+  }
+}
