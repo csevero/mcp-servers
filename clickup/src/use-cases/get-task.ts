@@ -1,18 +1,65 @@
-import type { Task, TaskRepository } from "../domain/task.js";
+import type { ClickupRepository } from "../domain/clickup.js";
+import type { Task, TaskCustomField } from "../types/entities.js";
 
 export class GetTaskUseCase {
-  constructor(private taskRepository: TaskRepository) {}
+  constructor(private clickupRepository: ClickupRepository) {}
 
-  async execute(customId: string): Promise<Task | null> {
-    return await this.taskRepository.getByCustomId(customId);
+  async execute(customTaskId: string): Promise<string | null> {
+    const task = await this.clickupRepository.getTaskByCustomId(customTaskId);
+
+    if (!task) return null;
+
+    return this.formatTask(task);
   }
 
-  formatTask(task: Task): string {
+  private formatTask(task: Task): string {
     return [
-      `Custom ID: ${task.customId || "Não definido"}`,
-      `Name: ${task.name || "Não definido"}`,
-      `Descrição: ${task.description || "Não definido"}`,
-      `Anexos: ${JSON.stringify(task.attachments || [])}`,
-    ].join("\n");
+      `**Custom ID**: ${task.custom_id || "Not defined"}`,
+      `**Name**: ${task.name || "Not defined"}`,
+      `**Description**: ${task.description || "Not defined"}`,
+      `**Attachments**: ${JSON.stringify(task.attachments || [])}`,
+      `**ListID**: ${task.list.id}`,
+      `**Custom Fields**: ${
+        task.custom_fields.length
+          ? JSON.stringify(this.formatCustomFields(task.custom_fields))
+          : "Not defined"
+      }`,
+    ].join("\n\n");
+  }
+
+  private formatCustomFields(customFields: TaskCustomField[]) {
+    const formattedCustomFields = customFields.map((customField) => {
+      const baseCustomField = {
+        id: customField.id,
+        name: customField.name,
+        type: customField.type,
+        ...(customField?.value && { value: customField.value }),
+      };
+
+      if (customField.type === "drop_down" && baseCustomField.value) {
+        const index = baseCustomField.value;
+
+        const realValue = customField.type_config.options?.find(
+          (option) => option.orderindex === index,
+        );
+
+        baseCustomField.value = realValue?.name || "";
+      }
+
+      if (customField.type === "labels" && baseCustomField.value) {
+        const labels = baseCustomField.value as string[];
+
+        const targetLabels = customField.type_config.options?.filter((option) =>
+          labels.includes(option.id),
+        );
+
+        baseCustomField.value =
+          targetLabels?.map((label) => label.label!) || [];
+      }
+
+      return baseCustomField;
+    });
+
+    return formattedCustomFields;
   }
 }

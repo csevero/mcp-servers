@@ -1,8 +1,12 @@
 import axios from "axios";
-import type { Task, TaskRepository } from "../domain/task.js";
-import type { GetTaskByCustomIdResponse } from "../types/clickup.js";
+import type { ClickupRepository } from "../domain/clickup.js";
+import type {
+  GetCustomFieldsOutput,
+  GetTaskByCustomIdOutput,
+  GetTaskCommentsOutput,
+} from "../types/api-responses.js";
 
-export class ClickupTaskRepository implements TaskRepository {
+export class ClickupApiRepository implements ClickupRepository {
   private readonly baseUrl = "https://api.clickup.com/api";
   private readonly teamId: string;
   private readonly apiKey: string;
@@ -12,9 +16,11 @@ export class ClickupTaskRepository implements TaskRepository {
     this.teamId = teamId;
   }
 
-  async getByCustomId(customId: string): Promise<Task | null> {
+  async getTaskByCustomId(
+    customId: string,
+  ): Promise<GetTaskByCustomIdOutput | null> {
     try {
-      const { data } = await axios.get<GetTaskByCustomIdResponse>(
+      const { data } = await axios.get<GetTaskByCustomIdOutput>(
         `${this.baseUrl}/v2/task/${customId}`,
         {
           params: {
@@ -27,14 +33,49 @@ export class ClickupTaskRepository implements TaskRepository {
         },
       );
 
-      return {
-        customId: data.custom_id,
-        name: data.name,
-        description: data.description,
-        attachments: data.attachments || [],
-      };
+      return data;
     } catch (error) {
-      console.error("Error fetching ClickUp task:", error);
+      console.error(`Error fetching clickup task ${customId}:`, error);
+      return null;
+    }
+  }
+
+  async getTaskCustomFields(listId: string) {
+    try {
+      const { data } = await axios.get<GetCustomFieldsOutput>(
+        `${this.baseUrl}/v2/list/${listId}/field`,
+        {
+          headers: {
+            Authorization: this.apiKey,
+          },
+        },
+      );
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching clickup custom fields:", error);
+      return null;
+    }
+  }
+
+  async getTaskComments(customTaskId: string) {
+    try {
+      const { data } = await axios.get<GetTaskCommentsOutput>(
+        `${this.baseUrl}/v2/task/${customTaskId}/comment`,
+        {
+          params: {
+            custom_task_ids: true,
+            team_id: this.teamId,
+          },
+          headers: {
+            Authorization: this.apiKey,
+          },
+        },
+      );
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching clickup task comments:", error);
       return null;
     }
   }

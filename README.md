@@ -17,69 +17,39 @@ Access and manage your ClickUp tasks directly from your AI assistant.
 - **Documentation**: [./clickup/README.md](./clickup/README.md)
 - **Features**:
   - Retrieve tasks by Custom ID
-  - View task details (name, description, attachments)
-  - Portuguese language support
+  - View task details and comments
+  - Access custom field configurations
+  - Secure API credential management
 
 ## Quick Start
 
-Each MCP server can be installed and run independently:
+### Using Claude Code (Recommended)
 
 ```bash
-# Install and run ClickUp MCP Server
+claude mcp add clickup --env CLICKUP_API_KEY=your_api_key_here \
+  --env CLICKUP_TEAM_ID=your_team_id_here \
+  -- npx @csevero/mcp-clickup
+```
+
+### Direct Installation
+
+```bash
 npx @csevero/mcp-clickup
 ```
 
-## Architecture
-
-This repository follows a monorepo structure where each MCP server is:
-
-- **Independent**: Has its own package.json and can be published separately
-- **Clean Architecture**: Follows domain-driven design principles
-- **TypeScript**: Fully typed for better development experience
-- **Easy to Install**: Available via npx for instant usage
-
-## Repository Structure
-
-```
-mcp-servers/
-├── clickup/          # ClickUp MCP Server
-│   ├── src/
-│   │   ├── domain/   # Business entities and interfaces
-│   │   ├── use-cases/# Business logic
-│   │   ├── infra/    # External integrations
-│   │   └── index.ts  # Main entry point
-│   ├── package.json
-│   └── README.md
-└── README.md         # This file
-```
+For detailed setup instructions, API credentials, and usage examples, see each server's README.
 
 ## Contributing
 
-We welcome contributions! Whether you want to:
+Contributions are welcome! To add a new MCP server or improve existing ones:
 
-- **Add new MCP servers** for different services
-- **Improve existing servers** with new features
-- **Fix bugs** or enhance documentation
-- **Suggest integrations** for popular tools
+1. Fork this repository
+2. Create a feature branch
+3. Follow the Clean Architecture pattern used in existing servers
+4. Add comprehensive documentation
+5. Submit a Pull Request
 
-### Getting Started
-
-1. **Fork this repository**
-2. **Create a new directory** for your MCP server (e.g., `./notion/`)
-3. **Follow the Clean Architecture pattern** used in existing servers
-4. **Add comprehensive README** with installation and usage instructions
-5. **Submit a Pull Request**
-
-### MCP Server Guidelines
-
-When creating a new MCP server:
-
-- Use Clean Architecture principles
-- Include TypeScript types
-- Add comprehensive error handling
-- Provide clear documentation
-- Follow the existing naming conventions
-- Include usage examples
+See individual server READMEs for architecture details and development guidelines.
 
 ## License
 
